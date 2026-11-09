@@ -2,21 +2,24 @@
 
 @layer base {
   :root {
-    --primary-purple: #6C5CE7;
-    --secondary-purple: #887CF6;
-    --deep-purple: #5036CC;
-    --light-lavender: #C4B5FD;
-    --bg-main: #F8F9FE;
-    --text-primary: #16163F;
-    --text-secondary: #7A7B98;
-    --success: #16B364;
+    --primary-blue: #2F5BEA;
+    --primary-dark: #2149D8;
+    --primary-light: #EAF0FF;
+    --primary-hover: #244CD9;
+    --bg-main: #F7F8FC;
+    --surface: #FFFFFF;
+    --text-primary: #171923;
+    --text-secondary: #858A9B;
+    --border: #E8EAF0;
+    --success: #16A66A;
     --expense: #EF4444;
+    --warning: #F59E0B;
   }
 
   body {
     background-color: #0F0F1A;
     font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
-    color: #16163F;
+    color: #171923;
     margin: 0;
     padding: 0;
     -webkit-font-smoothing: antialiased;
@@ -48,11 +51,11 @@
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-slide-up {
-  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Custom scrollbar hiding */

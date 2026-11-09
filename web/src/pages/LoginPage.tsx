@@ -51,25 +51,28 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col justify-between p-6 bg-[#F8F9FE] text-[#16163F]">
+    <div className="flex-1 flex flex-col justify-between p-6 bg-[#F7F8FC] text-[#171923]">
       <div className="pt-6 pb-2 text-center">
-        <AppLogo size="lg" showText={true} textColor="text-[#6C5CE7]" />
+        <div className="w-16 h-16 bg-[#2F5BEA] rounded-2xl mx-auto flex items-center justify-center shadow-md">
+          <AppLogo size="md" showText={false} />
+        </div>
+        <h1 className="text-xl font-bold text-[#171923] mt-3">MoneyCare</h1>
       </div>
 
       <div className="flex-1 flex flex-col justify-center max-w-sm w-full mx-auto space-y-6">
         <div className="text-center space-y-1">
-          <h2 className="text-2xl font-bold text-[#16163F]">Chào mừng trở lại</h2>
-          <p className="text-xs text-[#7A7B98]">Vui lòng nhập thông tin để đăng nhập</p>
+          <h2 className="text-2xl font-bold text-[#171923]">Chào mừng trở lại</h2>
+          <p className="text-xs text-[#858A9B]">Vui lòng nhập thông tin để đăng nhập</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-xs rounded-xl font-medium">
+            <div className="p-3 bg-red-50 border border-red-200 text-[#EF4444] text-xs rounded-xl font-medium">
               {error}
             </div>
           )}
           {successMsg && (
-            <div className="p-3 bg-green-50 border border-green-200 text-green-700 text-xs rounded-xl font-medium">
+            <div className="p-3 bg-green-50 border border-green-200 text-[#16A66A] text-xs rounded-xl font-medium">
               {successMsg}
             </div>
           )}
@@ -98,7 +101,7 @@ export const LoginPage: React.FC = () => {
             <button
               type="button"
               onClick={handleForgotPassword}
-              className="text-xs font-semibold text-[#6C5CE7] hover:underline"
+              className="text-xs font-semibold text-[#2F5BEA] hover:underline"
             >
               Quên mật khẩu?
             </button>
@@ -110,9 +113,9 @@ export const LoginPage: React.FC = () => {
         </form>
       </div>
 
-      <div className="text-center py-4 text-xs text-[#7A7B98]">
+      <div className="text-center py-4 text-xs text-[#858A9B]">
         Chưa có tài khoản?{' '}
-        <Link to="/register" className="font-bold text-[#6C5CE7] hover:underline">
+        <Link to="/register" className="font-bold text-[#2F5BEA] hover:underline">
           Đăng ký ngay
         </Link>
       </div>

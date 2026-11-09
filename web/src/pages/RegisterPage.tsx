@@ -47,20 +47,22 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col justify-between p-6 bg-[#F8F9FE] text-[#16163F]">
+    <div className="flex-1 flex flex-col justify-between p-6 bg-[#F7F8FC] text-[#171923]">
       <div className="pt-4 pb-2 text-center">
-        <AppLogo size="md" showText={true} textColor="text-[#6C5CE7]" />
+        <div className="w-14 h-14 bg-[#2F5BEA] rounded-2xl mx-auto flex items-center justify-center shadow-md">
+          <AppLogo size="sm" showText={false} />
+        </div>
       </div>
 
       <div className="flex-1 flex flex-col justify-center max-w-sm w-full mx-auto space-y-5">
         <div className="text-center space-y-1">
-          <h2 className="text-2xl font-bold text-[#16163F]">Tạo tài khoản mới</h2>
-          <p className="text-xs text-[#7A7B98]">Quản lý tài chính cùng MoneyCare</p>
+          <h2 className="text-2xl font-bold text-[#171923]">Tạo tài khoản mới</h2>
+          <p className="text-xs text-[#858A9B]">Quản lý tài chính cùng MoneyCare</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-xs rounded-xl font-medium">
+            <div className="p-3 bg-red-50 border border-red-200 text-[#EF4444] text-xs rounded-xl font-medium">
               {error}
             </div>
           )}
@@ -87,7 +89,7 @@ export const RegisterPage: React.FC = () => {
           <TextInput
             label="Mật khẩu"
             type="password"
-            placeholder="Mật khẩu ít nhất 6 ký tự"
+            placeholder="Ít nhất 6 ký tự"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             icon={<Lock className="w-4 h-4" />}
@@ -112,9 +114,9 @@ export const RegisterPage: React.FC = () => {
         </form>
       </div>
 
-      <div className="text-center py-4 text-xs text-[#7A7B98]">
+      <div className="text-center py-4 text-xs text-[#858A9B]">
         Đã có tài khoản?{' '}
-        <Link to="/login" className="font-bold text-[#6C5CE7] hover:underline">
+        <Link to="/login" className="font-bold text-[#2F5BEA] hover:underline">
           Đăng nhập ngay
         </Link>
       </div>

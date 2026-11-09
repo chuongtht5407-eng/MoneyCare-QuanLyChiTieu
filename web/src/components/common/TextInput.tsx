@@ -21,14 +21,14 @@ export const TextInput: React.FC<TextInputProps> = ({
   return (
     <div className="space-y-1.5 text-left w-full">
       {label && (
-        <label className="block text-xs sm:text-sm font-semibold text-[#16163F]">
+        <label className="block text-xs sm:text-sm font-semibold text-[#171923]">
           {label}
         </label>
       )}
 
       <div className="relative flex items-center">
         {icon && (
-          <div className="absolute left-3.5 text-[#7A7B98] pointer-events-none">
+          <div className="absolute left-3.5 text-[#858A9B] pointer-events-none">
             {icon}
           </div>
         )}
@@ -38,8 +38,8 @@ export const TextInput: React.FC<TextInputProps> = ({
           className={`w-full py-3 ${icon ? 'pl-10' : 'pl-4'} ${
             isPasswordType ? 'pr-11' : 'pr-4'
           } bg-white border ${
-            error ? 'border-[#EF4444]' : 'border-gray-200 focus:border-[#6C5CE7]'
-          } rounded-2xl text-sm font-medium text-[#16163F] placeholder:text-gray-400 outline-none transition-all shadow-sm ${className}`}
+            error ? 'border-[#EF4444]' : 'border-[#E8EAF0] focus:border-[#2F5BEA] focus:ring-2 focus:ring-[#2F5BEA]/10'
+          } rounded-xl text-sm font-medium text-[#171923] placeholder:text-[#858A9B] outline-none transition-all shadow-2xs ${className}`}
           {...props}
         />
 
@@ -47,7 +47,7 @@ export const TextInput: React.FC<TextInputProps> = ({
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3.5 text-[#7A7B98] hover:text-[#16163F] p-1"
+            className="absolute right-3.5 text-[#858A9B] hover:text-[#171923] p-1"
           >
             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>

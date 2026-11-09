@@ -23,40 +23,24 @@ export const SplashPage: React.FC = () => {
   }, [navigate]);
 
   return (
-    <div className="w-full h-full min-h-screen bg-gradient-to-b from-[#6C5CE7] via-[#5D4CDA] to-[#472EBA] flex flex-col justify-between relative overflow-hidden text-white select-none">
-      <div className="pt-12" />
+    <div className="w-full h-full min-h-screen bg-[#2F5BEA] flex flex-col justify-between items-center py-16 px-6 text-white select-none relative overflow-hidden">
+      <div className="pt-8" />
 
-      <div className="flex flex-col items-center justify-center px-6 text-center z-10 animate-fade-in space-y-3">
-        <AppLogo size="xl" showText={true} />
-        <p className="text-sm sm:text-base font-normal text-purple-100 max-w-[260px] leading-relaxed pt-2">
-          Quản lý tài chính cá nhân đơn giản và hiệu quả
+      <div className="flex flex-col items-center justify-center text-center z-10 animate-fade-in space-y-4">
+        <div className="w-20 h-20 rounded-[28px] bg-white/15 backdrop-blur-md flex items-center justify-center shadow-lg border border-white/20">
+          <AppLogo size="lg" showText={false} />
+        </div>
+        <h1 className="text-3xl font-extrabold tracking-tight">MoneyCare</h1>
+        <p className="text-sm font-normal text-blue-100 max-w-[260px] leading-relaxed">
+          Quản lý tài chính cá nhân thông minh
         </p>
       </div>
 
-      <div className="relative w-full h-64 z-0 pointer-events-none">
-        <svg
-          viewBox="0 0 390 280"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full object-cover"
-        >
-          <path
-            d="M 0 160 C 100 120, 240 220, 390 140 L 390 280 L 0 280 Z"
-            fill="#887CF6"
-            fillOpacity="0.25"
-          />
-          <path
-            d="M 0 190 C 120 150, 270 250, 390 180 L 390 280 L 0 280 Z"
-            fill="#C4B5FD"
-            fillOpacity="0.3"
-          />
-          <path
-            d="M 0 220 C 150 190, 260 260, 390 210 L 390 280 L 0 280 Z"
-            fill="#887CF6"
-            fillOpacity="0.35"
-          />
-        </svg>
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-32 h-1 bg-white/70 rounded-full" />
+      <div className="w-full max-w-[200px] flex flex-col items-center space-y-3">
+        <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
+          <div className="w-2/3 h-full bg-white rounded-full animate-pulse" />
+        </div>
+        <p className="text-[11px] text-blue-100 font-medium tracking-wide">Phiên bản 2.1.0</p>
       </div>
     </div>
   );

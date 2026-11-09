@@ -16,9 +16,8 @@ export const TransactionHistoryPage: React.FC = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<'all' | TransactionType>('all');
-  const [currentMonth, setCurrentMonth] = useState('Tháng 11/2026');
+  const [currentMonth] = useState('Tháng 11/2026');
 
-  // Filter logic
   const filtered = transactions.filter((tx) => {
     const matchesType = selectedType === 'all' || tx.type === selectedType;
     const matchesSearch =
@@ -35,7 +34,6 @@ export const TransactionHistoryPage: React.FC = () => {
     .filter((t) => t.type === 'expense')
     .reduce((s, t) => s + t.amount, 0);
 
-  // Group by date
   const grouped = filtered.reduce((groups, tx) => {
     const groupKey = tx.formattedTime.includes('Hôm nay')
       ? 'Hôm nay, 08/11'
@@ -48,41 +46,39 @@ export const TransactionHistoryPage: React.FC = () => {
   }, {} as Record<string, typeof transactions>);
 
   return (
-    <div className="flex-1 flex flex-col justify-between bg-[#F8F9FE] text-[#16163F]">
+    <div className="flex-1 flex flex-col justify-between bg-[#F7F8FC] text-[#171923]">
       <div>
         <PageHeader title="Giao dịch" showBack={false} />
 
         <div className="p-4 space-y-4">
-          {/* Search Input & Filter Button */}
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7A7B98]" />
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#858A9B]" />
               <input
                 type="text"
                 placeholder="Tìm kiếm giao dịch..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full py-2.5 pl-10 pr-4 bg-white border border-gray-100 rounded-2xl text-xs sm:text-sm font-medium outline-none focus:border-[#6C5CE7] shadow-2xs"
+                className="w-full py-2.5 pl-10 pr-4 bg-white border border-[#E8EAF0] rounded-xl text-xs sm:text-sm font-medium outline-none focus:border-[#2F5BEA] shadow-2xs"
               />
             </div>
             <button
               type="button"
-              className="p-2.5 rounded-2xl bg-white border border-gray-100 text-[#16163F] shadow-2xs hover:bg-gray-50"
+              className="p-2.5 rounded-xl bg-white border border-[#E8EAF0] text-[#171923] shadow-2xs hover:bg-gray-50"
               aria-label="Lọc"
             >
               <SlidersHorizontal className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Filter Type Tabs */}
-          <div className="bg-[#EEF0F8] p-1 rounded-2xl grid grid-cols-3 gap-1 text-center font-bold text-xs">
+          <div className="bg-[#F0F2F5] p-1 rounded-xl grid grid-cols-3 gap-1 text-center font-bold text-xs">
             <button
               type="button"
               onClick={() => setSelectedType('all')}
-              className={`py-2 rounded-xl transition-all ${
+              className={`py-2 rounded-lg transition-all ${
                 selectedType === 'all'
-                  ? 'bg-[#6C5CE7] text-white shadow-xs'
-                  : 'text-[#7A7B98] hover:text-[#16163F]'
+                  ? 'bg-[#2F5BEA] text-white shadow-xs'
+                  : 'text-[#858A9B] hover:text-[#171923]'
               }`}
             >
               Tất cả
@@ -90,10 +86,10 @@ export const TransactionHistoryPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setSelectedType('income')}
-              className={`py-2 rounded-xl transition-all ${
+              className={`py-2 rounded-lg transition-all ${
                 selectedType === 'income'
-                  ? 'bg-[#16B364] text-white shadow-xs'
-                  : 'text-[#7A7B98] hover:text-[#16163F]'
+                  ? 'bg-[#16A66A] text-white shadow-xs'
+                  : 'text-[#858A9B] hover:text-[#171923]'
               }`}
             >
               Thu nhập
@@ -101,34 +97,31 @@ export const TransactionHistoryPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setSelectedType('expense')}
-              className={`py-2 rounded-xl transition-all ${
+              className={`py-2 rounded-lg transition-all ${
                 selectedType === 'expense'
                   ? 'bg-[#EF4444] text-white shadow-xs'
-                  : 'text-[#7A7B98] hover:text-[#16163F]'
+                  : 'text-[#858A9B] hover:text-[#171923]'
               }`}
             >
               Chi tiêu
             </button>
           </div>
 
-          {/* Month Selector */}
-          <div className="flex items-center justify-between bg-white rounded-2xl p-3 border border-gray-100 text-xs font-semibold shadow-2xs">
-            <button type="button" className="p-1 text-gray-500 hover:text-[#6C5CE7]">
+          <div className="flex items-center justify-between bg-white rounded-2xl p-3 border border-[#E8EAF0] text-xs font-semibold shadow-2xs">
+            <button type="button" className="p-1 text-gray-500 hover:text-[#2F5BEA]">
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-[#16163F] font-bold">{currentMonth}</span>
-            <button type="button" className="p-1 text-gray-500 hover:text-[#6C5CE7]">
+            <span className="text-[#171923] font-bold">{currentMonth}</span>
+            <button type="button" className="p-1 text-gray-500 hover:text-[#2F5BEA]">
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Income & Expense Summary Bar */}
           <div className="flex items-center justify-between px-2 text-xs font-bold">
-            <span className="text-[#16B364]">+{formatCurrency(totalIncome)}</span>
+            <span className="text-[#16A66A]">+{formatCurrency(totalIncome)}</span>
             <span className="text-[#EF4444]">-{formatCurrency(totalExpense)}</span>
           </div>
 
-          {/* Grouped Transaction List */}
           {loading ? (
             <LoadingState message="Đang tải lịch sử giao dịch..." />
           ) : filtered.length === 0 ? (
@@ -137,10 +130,10 @@ export const TransactionHistoryPage: React.FC = () => {
             <div className="space-y-4 pt-1">
               {Object.entries(grouped).map(([dateLabel, items]) => (
                 <div key={dateLabel} className="space-y-1.5">
-                  <h4 className="text-xs font-bold text-[#7A7B98] px-1">
+                  <h4 className="text-xs font-bold text-[#858A9B] px-1">
                     {dateLabel}
                   </h4>
-                  <div className="bg-white rounded-2xl p-2 border border-gray-100 shadow-2xs divide-y divide-gray-50">
+                  <div className="bg-white rounded-[20px] p-2 border border-[#E8EAF0] shadow-2xs divide-y divide-[#F0F2F5]">
                     {items.map((tx) => (
                       <div
                         key={tx.id}

@@ -44,12 +44,12 @@ export const DashboardPage: React.FC = () => {
   const displayName = user?.displayName || 'Minh Hùng';
 
   return (
-    <div className="flex-1 flex flex-col justify-between bg-[#F8F9FE] text-[#16163F]">
+    <div className="flex-1 flex flex-col justify-between bg-[#F7F8FC] text-[#171923]">
       <div className="p-5 space-y-5 flex-1">
         {/* Header Section */}
         <div className="flex items-center justify-between pt-1">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#6C5CE7] to-[#887CF6] p-0.5 shadow-sm overflow-hidden shrink-0">
+            <div className="w-11 h-11 rounded-full bg-[#2F5BEA] p-0.5 shadow-sm overflow-hidden shrink-0">
               <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
                 <svg viewBox="0 0 100 100" className="w-full h-full">
                   <rect width="100" height="100" fill="#E2E8F0" />
@@ -58,14 +58,14 @@ export const DashboardPage: React.FC = () => {
                   <circle cx="43" cy="48" r="2.5" fill="#1E293B" />
                   <circle cx="57" cy="48" r="2.5" fill="#1E293B" />
                   <path d="M 44 56 Q 50 62 56 56" stroke="#1E293B" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-                  <path d="M 15 95 C 20 70, 80 70, 85 95 Z" fill="#4F46E5" />
+                  <path d="M 15 95 C 20 70, 80 70, 85 95 Z" fill="#2F5BEA" />
                 </svg>
               </div>
             </div>
 
             <div>
-              <p className="text-xs text-[#7A7B98]">Xin chào,</p>
-              <h2 className="text-base sm:text-lg font-bold text-[#16163F] tracking-tight">
+              <p className="text-xs text-[#858A9B]">Xin chào,</p>
+              <h2 className="text-base sm:text-lg font-bold text-[#171923] tracking-tight">
                 {displayName} 👋
               </h2>
             </div>
@@ -74,10 +74,10 @@ export const DashboardPage: React.FC = () => {
           <button
             onClick={handleNotificationClick}
             type="button"
-            className="relative w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-50 active:scale-95 transition-all shadow-sm"
+            className="relative w-10 h-10 rounded-full bg-white border border-[#E8EAF0] flex items-center justify-center text-[#171923] hover:bg-gray-50 active:scale-95 transition-all shadow-2xs"
             aria-label="Thông báo"
           >
-            <Bell className="w-5 h-5 text-[#16163F]" />
+            <Bell className="w-5 h-5 text-[#171923]" />
             <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-[#EF4444] ring-2 ring-white" />
           </button>
         </div>
@@ -103,10 +103,10 @@ export const DashboardPage: React.FC = () => {
         {/* 4. Recent Transactions */}
         <div className="space-y-3 pt-1">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-[#16163F]">Giao dịch gần đây</h3>
+            <h3 className="text-base font-bold text-[#171923]">Giao dịch gần đây</h3>
             <button
               onClick={() => navigate('/transactions')}
-              className="text-xs font-semibold text-[#6C5CE7] hover:underline"
+              className="text-xs font-semibold text-[#2F5BEA] hover:underline"
               type="button"
             >
               Xem tất cả
@@ -116,7 +116,7 @@ export const DashboardPage: React.FC = () => {
           {txLoading ? (
             <LoadingState message="Đang tải giao dịch..." />
           ) : (
-            <div className="bg-white rounded-2xl p-2 border border-gray-100 shadow-sm divide-y divide-gray-50">
+            <div className="bg-white rounded-[20px] p-2.5 border border-[#E8EAF0] shadow-2xs divide-y divide-[#F0F2F5]">
               {recentTransactions.map((tx) => (
                 <div
                   key={tx.id}

@@ -17,17 +17,17 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   ...props
 }) => {
   const baseStyle =
-    'py-3.5 px-6 rounded-2xl font-bold text-sm sm:text-base transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none shadow-md';
+    'py-3.5 px-6 rounded-xl font-bold text-sm sm:text-base transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none shadow-sm';
 
   const variants = {
     primary:
-      'bg-gradient-to-r from-[#6C5CE7] to-[#887CF6] hover:from-[#5A4AD1] hover:to-[#776BE3] text-white shadow-[#6C5CE7]/30',
+      'bg-[#2F5BEA] hover:bg-[#244CD9] text-white shadow-[#2F5BEA]/30 shadow-md',
     secondary:
-      'bg-[#EEF0F8] hover:bg-[#E2E6F5] text-[#16163F] shadow-none',
+      'bg-[#F0F2F5] hover:bg-[#E4E7EC] text-[#171923] shadow-none',
     danger:
       'bg-[#EF4444] hover:bg-[#DC2626] text-white shadow-[#EF4444]/30',
     outline:
-      'bg-transparent border-2 border-[#6C5CE7] text-[#6C5CE7] hover:bg-[#6C5CE7]/5 shadow-none',
+      'bg-transparent border-2 border-[#2F5BEA] text-[#2F5BEA] hover:bg-[#2F5BEA]/5 shadow-none',
   };
 
   return (

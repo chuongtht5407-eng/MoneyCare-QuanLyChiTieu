@@ -23,7 +23,6 @@ export const BudgetPage: React.FC = () => {
 
   const totalLimit = budget ? budget.totalLimit : 3000000;
 
-  // Calculate spent amounts dynamically per category
   const categorySpent: Record<string, number> = {
     rent: 0,
     food: 0,
@@ -86,61 +85,58 @@ export const BudgetPage: React.FC = () => {
   ];
 
   return (
-    <div className="flex-1 flex flex-col justify-between bg-[#F8F9FE] text-[#16163F]">
+    <div className="flex-1 flex flex-col justify-between bg-[#F7F8FC] text-[#171923]">
       <div>
         <PageHeader title="Ngân sách" />
 
         <div className="p-4 space-y-4">
-          {/* Month Selector */}
-          <div className="flex items-center justify-between bg-white rounded-2xl p-3 border border-gray-100 text-xs font-semibold shadow-2xs">
-            <button type="button" className="p-1 text-gray-500 hover:text-[#6C5CE7]">
+          <div className="flex items-center justify-between bg-white rounded-2xl p-3 border border-[#E8EAF0] text-xs font-semibold shadow-2xs">
+            <button type="button" className="p-1 text-gray-500 hover:text-[#2F5BEA]">
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-[#16163F] font-bold">Tháng 11/2026</span>
-            <button type="button" className="p-1 text-gray-500 hover:text-[#6C5CE7]">
+            <span className="text-[#171923] font-bold">Tháng 11/2026</span>
+            <button type="button" className="p-1 text-gray-500 hover:text-[#2F5BEA]">
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Main Monthly Budget Card */}
-          <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm space-y-3">
+          <div className="bg-white rounded-[20px] p-5 border border-[#E8EAF0] shadow-sm space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-[#7A7B98] font-semibold">Hạn mức chi tiêu tháng</span>
+              <span className="text-xs text-[#858A9B] font-semibold">Hạn mức chi tiêu tháng</span>
               <button
                 type="button"
                 onClick={openEditModal}
-                className="w-8 h-8 rounded-full bg-purple-50 text-[#6C5CE7] flex items-center justify-center hover:bg-purple-100 transition-colors"
+                className="w-8 h-8 rounded-full bg-[#EAF0FF] text-[#2F5BEA] flex items-center justify-center hover:bg-blue-100 transition-colors"
                 aria-label="Chỉnh sửa hạn mức"
               >
                 <Edit3 className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-2xl font-extrabold text-[#16163F]">
+            <p className="text-2xl font-extrabold text-[#171923]">
               {formatCurrency(totalLimit)}
             </p>
 
-            {/* Progress Bar */}
-            <div className="w-full h-3 bg-[#EEF0F8] rounded-full overflow-hidden">
+            <div className="w-full h-3 bg-[#F0F2F5] rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-500 ${
                   totalPercentage >= 100
                     ? 'bg-[#EF4444]'
                     : totalPercentage >= 80
                     ? 'bg-[#F59E0B]'
-                    : 'bg-[#6C5CE7]'
+                    : 'bg-[#2F5BEA]'
                 }`}
                 style={{ width: `${Math.min(totalPercentage, 100)}%` }}
               />
             </div>
 
             <div className="flex items-center justify-between text-xs pt-1">
-              <span className="text-[#7A7B98]">
-                Đã chi: <strong className="text-gray-800 font-bold">{formatCurrency(totalSpent)}</strong>
+              <span className="text-[#858A9B]">
+                Đã chi: <strong className="text-[#171923] font-bold">{formatCurrency(totalSpent)}</strong>
               </span>
-              <span className="text-[#7A7B98]">
+              <span className="text-[#858A9B]">
                 Còn lại:{' '}
-                <strong className={remaining < 0 ? 'text-[#EF4444] font-bold' : 'text-[#16B364] font-bold'}>
+                <strong className={remaining < 0 ? 'text-[#EF4444] font-bold' : 'text-[#16A66A] font-bold'}>
                   {formatCurrency(remaining)}
                 </strong>
               </span>
@@ -158,9 +154,8 @@ export const BudgetPage: React.FC = () => {
             )}
           </div>
 
-          {/* Category Breakdown */}
           <div className="space-y-3 pt-1">
-            <h3 className="text-sm font-bold text-[#16163F]">Chi tiết theo danh mục</h3>
+            <h3 className="text-sm font-bold text-[#171923]">Chi tiết theo danh mục</h3>
 
             <div className="space-y-2.5">
               {categoryConfigs.map((cat) => {
@@ -174,22 +169,22 @@ export const BudgetPage: React.FC = () => {
                     : 'bg-emerald-100 text-emerald-800';
 
                 return (
-                  <div key={cat.id} className="bg-white rounded-2xl p-3.5 border border-gray-100 shadow-2xs space-y-2">
+                  <div key={cat.id} className="bg-white rounded-[20px] p-4 border border-[#E8EAF0] shadow-2xs space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold text-[#16163F]">{cat.name}</span>
+                      <span className="font-bold text-[#171923]">{cat.name}</span>
                       <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${tagColor}`}>
                         {percentage.toFixed(1)}%
                       </span>
                     </div>
 
-                    <div className="w-full h-2 bg-[#EEF0F8] rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-[#F0F2F5] rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-[#6C5CE7] rounded-full transition-all"
+                        className="h-full bg-[#2F5BEA] rounded-full transition-all"
                         style={{ width: `${Math.min(percentage, 100)}%` }}
                       />
                     </div>
 
-                    <p className="text-[11px] text-[#7A7B98] text-right">
+                    <p className="text-[11px] text-[#858A9B] text-right">
                       {formatCurrency(spent)} / {formatCurrency(cat.limit)}
                     </p>
                   </div>
@@ -208,12 +203,11 @@ export const BudgetPage: React.FC = () => {
         if (tab === 'profile') navigate('/profile');
       }} />
 
-      {/* Edit Budget Bottom Sheet Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end justify-center p-0 animate-fade-in">
           <div className="bg-white rounded-t-3xl p-5 w-full max-w-md space-y-4 max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-              <h3 className="text-base font-bold text-[#16163F]">Thiết lập ngân sách</h3>
+            <div className="flex items-center justify-between border-b border-[#E8EAF0] pb-3">
+              <h3 className="text-base font-bold text-[#171923]">Thiết lập ngân sách</h3>
               <button
                 type="button"
                 onClick={() => setIsEditModalOpen(false)}
@@ -231,7 +225,7 @@ export const BudgetPage: React.FC = () => {
             />
 
             <div className="space-y-3 pt-2">
-              <h4 className="text-xs font-bold text-[#16163F]">Hạn mức từng danh mục</h4>
+              <h4 className="text-xs font-bold text-[#171923]">Hạn mức từng danh mục</h4>
               <TextInput
                 label="Tiền trọ"
                 type="number"
