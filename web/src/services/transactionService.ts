@@ -12,6 +12,7 @@ import { db, isFirebaseConfigured } from '../lib/firebase';
 import { Transaction } from '../types/transaction';
 import { DEMO_TRANSACTIONS } from '../data/demoTransactions';
 import { getCurrentUserProfile } from './authService';
+import { reportCloudSuccess, reportCloudFailure } from './syncStatus';
 
 const LOCAL_TX_KEY = 'moneycare_transactions';
 
@@ -45,8 +46,10 @@ export async function fetchTransactions(): Promise<Transaction[]> {
       snapshot.forEach((d) => {
         list.push({ id: d.id, ...d.data() } as Transaction);
       });
+      reportCloudSuccess();
       return list;
     } catch (err) {
+      reportCloudFailure(err);
       console.warn('Firestore fetch failed, returning local transactions:', err);
       return getLocalTransactions();
     }
@@ -68,8 +71,10 @@ export async function createTransaction(
         createdAt: now,
         updatedAt: now,
       });
+      reportCloudSuccess();
       return { id: docRef.id, ...data };
     } catch (err) {
+      reportCloudFailure(err);
       console.warn('Firestore create error, falling back to local storage:', err);
     }
   }
@@ -100,8 +105,10 @@ export async function updateTransaction(
         ...data,
         updatedAt: now,
       });
+      reportCloudSuccess();
       return;
     } catch (err) {
+      reportCloudFailure(err);
       console.warn('Firestore update error, updating locally:', err);
     }
   }
@@ -121,13 +128,15 @@ export async function deleteTransaction(id: string): Promise<void> {
     try {
       const docRef = doc(db, 'users', user.uid, 'transactions', id);
       await deleteDoc(docRef);
+      reportCloudSuccess();
       return;
     } catch (err) {
+      reportCloudFailure(err);
       console.warn('Firestore delete error, deleting locally:', err);
     }
   }
 
   const current = getLocalTransactions();
-  const filtered = current.filter((t) => t.id === id ? false : true);
+  const filtered = current.filter((t) => (t.id === id ? false : true));
   saveLocalTransactions(filtered);
 }
