@@ -2,6 +2,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db, isFirebaseConfigured } from '../lib/firebase';
 import { MonthlyBudget } from '../types/budget';
 import { getCurrentUserProfile } from './authService';
+import { reportCloudSuccess, reportCloudFailure } from './syncStatus';
 
 const LOCAL_BUDGET_KEY = 'moneycare_monthly_budgets';
 
@@ -39,25 +40,30 @@ export async function fetchMonthlyBudget(monthYear: string = '2026-11'): Promise
       const docRef = doc(db, 'users', user.uid, 'budgets', monthYear);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
+        reportCloudSuccess();
         return docSnap.data() as MonthlyBudget;
       }
+      reportCloudSuccess();
     } catch (err) {
+      reportCloudFailure(err);
       console.warn('Firestore fetch budget failed, returning local budget:', err);
     }
   }
 
   const localBudgets = getLocalBudgets();
-  return localBudgets[monthYear] || {
-    id: monthYear,
-    monthYear: `Tháng ${monthYear.split('-')[1]}/${monthYear.split('-')[0]}`,
-    totalLimit: 3000000,
-    categoryLimits: {
-      rent: 2000000,
-      food: 800000,
-      shopping: 300000,
-      transport: 700000,
-    },
-  };
+  return (
+    localBudgets[monthYear] || {
+      id: monthYear,
+      monthYear: `Tháng ${monthYear.split('-')[1]}/${monthYear.split('-')[0]}`,
+      totalLimit: 3000000,
+      categoryLimits: {
+        rent: 2000000,
+        food: 800000,
+        shopping: 300000,
+        transport: 700000,
+      },
+    }
+  );
 }
 
 export async function saveMonthlyBudget(budget: MonthlyBudget): Promise<void> {
@@ -69,7 +75,9 @@ export async function saveMonthlyBudget(budget: MonthlyBudget): Promise<void> {
     try {
       const docRef = doc(db, 'users', user.uid, 'budgets', budget.id);
       await setDoc(docRef, data, { merge: true });
+      reportCloudSuccess();
     } catch (err) {
+      reportCloudFailure(err);
       console.warn('Firestore save budget error, saving locally:', err);
     }
   }

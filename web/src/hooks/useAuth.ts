@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { UserProfile } from '../types/auth';
 import {
   getCurrentUserProfile,
@@ -6,6 +6,7 @@ import {
   loginUser,
   registerUser,
   logoutUser,
+  updateUserDisplayName,
 } from '../services/authService';
 
 export function useAuth() {
@@ -20,6 +21,12 @@ export function useAuth() {
     return () => unsubscribe();
   }, []);
 
+  const updateName = useCallback(async (name: string): Promise<UserProfile> => {
+    const updated = await updateUserDisplayName(name);
+    setUser(updated);
+    return updated;
+  }, []);
+
   return {
     user,
     loading,
@@ -27,5 +34,6 @@ export function useAuth() {
     login: loginUser,
     register: registerUser,
     logout: logoutUser,
+    updateName,
   };
 }
