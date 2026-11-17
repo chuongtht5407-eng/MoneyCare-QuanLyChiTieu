@@ -27,6 +27,21 @@ export function useTransactions() {
 
   useEffect(() => {
     loadTransactions();
+
+    // Tự động tải lại dữ liệu khi tab được focus lại hoặc chuyển qua lại giữa các tab
+    const handleFocus = () => {
+      if (document.visibilityState === 'visible') {
+        loadTransactions();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
+    };
   }, [loadTransactions]);
 
   const addTx = async (data: Omit<Transaction, 'id'>) => {

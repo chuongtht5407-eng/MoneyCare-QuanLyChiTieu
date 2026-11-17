@@ -31,3 +31,15 @@ dist-ssr
 
 # TypeScript build info
 *.tsbuildinfo
+
+# Additional ignores
+node_modules/
+dist/
+.env*.local
+build/
+.gradle/
+.kotlin/
+.idea/
+local.properties
+*.log
+Thumbs.db

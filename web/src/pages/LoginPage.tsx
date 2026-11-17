@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { AppLogo } from '../components/AppLogo';
 import { TextInput } from '../components/common/TextInput';
 import { PrimaryButton } from '../components/common/PrimaryButton';
@@ -8,11 +8,19 @@ import { loginUser, sendPasswordReset } from '../services/authService';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('expired') === '1') {
+      setError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,8 +53,8 @@ export const LoginPage: React.FC = () => {
       await sendPasswordReset(email);
       setSuccessMsg(`Đã gửi email khôi phục tới ${email}. Vui lòng kiểm tra hộp thư.`);
       setError('');
-    } catch {
-      setError('Không thể gửi email khôi phục. Vui lòng kiểm tra địa chỉ email.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Không thể gửi email khôi phục.');
     }
   };
 

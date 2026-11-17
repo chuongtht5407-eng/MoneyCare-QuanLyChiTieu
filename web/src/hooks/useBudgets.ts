@@ -20,6 +20,21 @@ export function useBudgets(monthYear: string = '2026-11') {
 
   useEffect(() => {
     loadBudget();
+
+    // Tự động tải lại dữ liệu ngân sách khi tab được focus lại
+    const handleFocus = () => {
+      if (document.visibilityState === 'visible') {
+        loadBudget();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
+    };
   }, [loadBudget]);
 
   const updateBudget = async (newBudget: MonthlyBudget) => {

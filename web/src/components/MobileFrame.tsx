@@ -1,5 +1,6 @@
 import React from 'react';
 import { Wifi, Battery, Signal } from 'lucide-react';
+import { SyncBanner } from './SyncBanner';
 
 interface MobileFrameProps {
   children: React.ReactNode;
@@ -28,6 +29,9 @@ export const MobileFrame: React.FC<MobileFrameProps> = ({
             <Battery className="w-4 h-4" />
           </div>
         </div>
+
+        {/* Sync Status Banner */}
+        <SyncBanner />
 
         {/* Dynamic Screen Content */}
         <div className="flex-1 flex flex-col overflow-y-auto no-scrollbar relative">

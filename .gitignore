@@ -46,3 +46,11 @@ web/.env.*
 !web/.env.example
 *.tsbuildinfo
 .DS_Store
+
+# Additional ignores
+node_modules/
+dist/
+.env.local
+.env*.local
+.kotlin/
+Thumbs.db
