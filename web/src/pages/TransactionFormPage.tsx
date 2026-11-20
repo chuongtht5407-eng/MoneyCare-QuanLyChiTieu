@@ -4,7 +4,23 @@ import { PageHeader } from '../components/layout/PageHeader';
 import { PrimaryButton } from '../components/common/PrimaryButton';
 import { TextInput } from '../components/common/TextInput';
 import { ConfirmDialog } from '../components/common/ConfirmDialog';
-import { Utensils, ShoppingBag, Car, Home, Sparkles, Wallet, Trash2, Calendar, FileText } from 'lucide-react';
+import {
+  Utensils,
+  ShoppingBag,
+  Car,
+  Home,
+  Sparkles,
+  Receipt,
+  HeartPulse,
+  MoreHorizontal,
+  Wallet,
+  Gift,
+  TrendingUp,
+  CircleDollarSign,
+  Trash2,
+  Calendar,
+  FileText,
+} from 'lucide-react';
 import { useTransactions } from '../hooks/useTransactions';
 import { TransactionType } from '../types/transaction';
 import { DEFAULT_CATEGORIES } from '../services/categoryService';
@@ -12,7 +28,7 @@ import { DEFAULT_CATEGORIES } from '../services/categoryService';
 export const TransactionFormPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { transactions, addTx, updateTx, deleteTx } = useTransactions();
+  const { transactions, addTx, updateTx, deleteTx, isSubmitting, getTxById } = useTransactions();
 
   const isEdit = Boolean(id);
   const editingTx = isEdit ? transactions.find((t) => t.id === id) : null;
@@ -26,6 +42,7 @@ export const TransactionFormPage: React.FC = () => {
   const [showConfirmDelete, setShowConfirmDelete] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
+  // Nạp dữ liệu khi chỉnh sửa giao dịch (từ state hoặc fetch theo ID nếu reload trang)
   useEffect(() => {
     if (editingTx) {
       setType(editingTx.type);
@@ -33,12 +50,21 @@ export const TransactionFormPage: React.FC = () => {
       setCategoryId(editingTx.categoryId);
       setDate(editingTx.date);
       setNote(editingTx.note || '');
+    } else if (isEdit && id) {
+      getTxById(id).then((tx) => {
+        if (tx) {
+          setType(tx.type);
+          setAmountInput(tx.amount.toString());
+          setCategoryId(tx.categoryId);
+          setDate(tx.date);
+          setNote(tx.note || '');
+        }
+      });
     }
-  }, [editingTx]);
+  }, [editingTx, isEdit, id, getTxById]);
 
-  const availableCategories = DEFAULT_CATEGORIES.filter(
-    (c) => c.type === type || (type === 'expense' && c.type === 'expense')
-  );
+  // Lọc danh mục chuẩn theo loại Thu nhập hoặc Chi tiêu
+  const availableCategories = DEFAULT_CATEGORIES.filter((c) => c.type === type);
 
   const handleQuickAmount = (value: number) => {
     setAmountInput(value.toString());
@@ -50,13 +76,22 @@ export const TransactionFormPage: React.FC = () => {
     return new Intl.NumberFormat('vi-VN').format(num) + ' đ';
   };
 
+  const isProcessing = isLoading || isSubmitting;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isProcessing) return;
+
     setError('');
 
     const parsedAmount = parseInt(amountInput, 10);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       setError('Vui lòng nhập số tiền hợp lệ (lớn hơn 0).');
+      return;
+    }
+
+    if (!categoryId) {
+      setError('Vui lòng chọn danh mục giao dịch.');
       return;
     }
 
@@ -91,22 +126,22 @@ export const TransactionFormPage: React.FC = () => {
         });
       }
       navigate('/transactions');
-    } catch {
-      setError('Lỗi khi lưu giao dịch. Vui lòng thử lại.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Lỗi khi lưu giao dịch. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!id) return;
+    if (!id || isProcessing) return;
     setIsLoading(true);
     try {
       await deleteTx(id);
       setShowConfirmDelete(false);
       navigate('/transactions');
-    } catch {
-      setError('Lỗi khi xóa giao dịch.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Lỗi khi xóa giao dịch.');
       setIsLoading(false);
     }
   };
@@ -118,6 +153,13 @@ export const TransactionFormPage: React.FC = () => {
       case 'car': return <Car className="w-5 h-5" />;
       case 'home': return <Home className="w-5 h-5" />;
       case 'sparkles': return <Sparkles className="w-5 h-5" />;
+      case 'receipt': return <Receipt className="w-5 h-5" />;
+      case 'heart-pulse': return <HeartPulse className="w-5 h-5" />;
+      case 'more-horizontal': return <MoreHorizontal className="w-5 h-5" />;
+      case 'wallet': return <Wallet className="w-5 h-5" />;
+      case 'gift': return <Gift className="w-5 h-5" />;
+      case 'trending-up': return <TrendingUp className="w-5 h-5" />;
+      case 'circle-dollar-sign': return <CircleDollarSign className="w-5 h-5" />;
       default: return <Wallet className="w-5 h-5" />;
     }
   };
@@ -154,7 +196,11 @@ export const TransactionFormPage: React.FC = () => {
               type="button"
               onClick={() => {
                 setType('expense');
-                if (categoryId === 'salary') setCategoryId('food');
+                // Tự động chuyển danh mục hợp lệ thuộc nhóm Chi tiêu
+                const isCurrentExpense = DEFAULT_CATEGORIES.some((c) => c.id === categoryId && c.type === 'expense');
+                if (!isCurrentExpense) {
+                  setCategoryId('food');
+                }
               }}
               className={`py-2.5 rounded-lg transition-all ${
                 type === 'expense'
@@ -168,7 +214,11 @@ export const TransactionFormPage: React.FC = () => {
               type="button"
               onClick={() => {
                 setType('income');
-                setCategoryId('salary');
+                // Tự động chuyển danh mục hợp lệ thuộc nhóm Thu nhập
+                const isCurrentIncome = DEFAULT_CATEGORIES.some((c) => c.id === categoryId && c.type === 'income');
+                if (!isCurrentIncome) {
+                  setCategoryId('salary');
+                }
               }}
               className={`py-2.5 rounded-lg transition-all ${
                 type === 'income'
@@ -260,7 +310,7 @@ export const TransactionFormPage: React.FC = () => {
           />
 
           <div className="pt-3">
-            <PrimaryButton type="submit" isLoading={isLoading}>
+            <PrimaryButton type="submit" isLoading={isProcessing}>
               {isEdit ? 'Cập nhật giao dịch' : 'Lưu giao dịch'}
             </PrimaryButton>
           </div>
@@ -274,7 +324,7 @@ export const TransactionFormPage: React.FC = () => {
         confirmText="Xóa"
         onConfirm={handleDelete}
         onCancel={() => setShowConfirmDelete(false)}
-        isLoading={isLoading}
+        isLoading={isProcessing}
       />
     </div>
   );
