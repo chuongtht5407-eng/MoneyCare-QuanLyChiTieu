@@ -8,20 +8,38 @@ import { TransactionItem } from '../components/TransactionItem';
 import { BottomNavigation } from '../components/BottomNavigation';
 import { Toast } from '../components/Toast';
 import { LoadingState } from '../components/common/LoadingState';
+import { EmptyState } from '../components/common/EmptyState';
 import { useAuth } from '../hooks/useAuth';
 import { useTransactions } from '../hooks/useTransactions';
 import { useBudgets } from '../hooks/useBudgets';
-import { calculateFinancialSummary } from '../utils/finance';
+import {
+  calculateTotalBalance,
+  calculateMonthlyIncome,
+  calculateMonthlyExpense,
+  calculateBudgetUsage,
+} from '../utils/finance';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { transactions, loading: txLoading } = useTransactions();
-  const { budget } = useBudgets('2026-11');
+
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth() + 1;
+  const monthKey = `${currentYear}-${currentMonth < 10 ? '0' : ''}${currentMonth}`;
+
+  const { budget } = useBudgets(monthKey);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Dynamic calculations from user's real transactions
+  const totalBalance = calculateTotalBalance(transactions);
+  const monthlyIncome = calculateMonthlyIncome(transactions, currentYear, currentMonth);
+  const monthlyExpense = calculateMonthlyExpense(transactions, currentYear, currentMonth);
+
   const budgetLimit = budget ? budget.totalLimit : 3000000;
-  const summary = calculateFinancialSummary(transactions, budgetLimit);
+  const budgetUsage = calculateBudgetUsage(monthlyExpense, budgetLimit);
+
   const recentTransactions = transactions.slice(0, 3);
 
   const handleTabClick = (tabName: string) => {
@@ -82,25 +100,25 @@ export const DashboardPage: React.FC = () => {
           </button>
         </div>
 
-        {/* 1. Balance Card */}
-        <BalanceCard balance={summary.currentBalance} />
+        {/* 1. Dynamic Overall Balance Card */}
+        <BalanceCard balance={totalBalance} />
 
-        {/* 2. Income & Expense Cards */}
+        {/* 2. Dynamic Monthly Income & Expense Cards */}
         <FinanceSummaryCard
-          income={summary.totalIncome}
-          expense={summary.totalExpense}
+          income={monthlyIncome}
+          expense={monthlyExpense}
         />
 
         {/* 3. Monthly Budget Progress Card */}
         <div onClick={() => navigate('/budget')} className="cursor-pointer">
           <BudgetProgress
-            spent={summary.budgetSpent}
-            limit={summary.budgetLimit}
-            percentage={summary.budgetUsagePercentage}
+            spent={monthlyExpense}
+            limit={budgetLimit}
+            percentage={budgetUsage.percentage}
           />
         </div>
 
-        {/* 4. Recent Transactions */}
+        {/* 4. Dynamic Recent Transactions */}
         <div className="space-y-3 pt-1">
           <div className="flex items-center justify-between">
             <h3 className="text-base font-bold text-[#171923]">Giao dịch gần đây</h3>
@@ -115,6 +133,11 @@ export const DashboardPage: React.FC = () => {
 
           {txLoading ? (
             <LoadingState message="Đang tải giao dịch..." />
+          ) : recentTransactions.length === 0 ? (
+            <EmptyState
+              title="Chưa có giao dịch"
+              description="Hãy nhấn nút (+) bên dưới để thêm giao dịch đầu tiên."
+            />
           ) : (
             <div className="bg-white rounded-[20px] p-2.5 border border-[#E8EAF0] shadow-2xs divide-y divide-[#F0F2F5]">
               {recentTransactions.map((tx) => (

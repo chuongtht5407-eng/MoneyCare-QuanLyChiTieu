@@ -7,12 +7,25 @@ import { TextInput } from '../components/common/TextInput';
 import { ChevronLeft, ChevronRight, Edit3, X, AlertTriangle } from 'lucide-react';
 import { useBudgets } from '../hooks/useBudgets';
 import { useTransactions } from '../hooks/useTransactions';
-import { formatCurrency } from '../utils/finance';
+import {
+  formatCurrency,
+  calculateMonthlyExpense,
+  calculateMonthlyCategoryExpense,
+  calculateBudgetUsage,
+} from '../utils/finance';
 
 export const BudgetPage: React.FC = () => {
   const navigate = useNavigate();
-  const { budget, updateBudget } = useBudgets('2026-11');
   const { transactions } = useTransactions();
+
+  const today = new Date();
+  const [selectedYear, setSelectedYear] = useState<number>(today.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState<number>(today.getMonth() + 1);
+
+  const monthKey = `${selectedYear}-${selectedMonth < 10 ? '0' : ''}${selectedMonth}`;
+  const monthDisplayStr = `Tháng ${selectedMonth < 10 ? '0' : ''}${selectedMonth}/${selectedYear}`;
+
+  const { budget, updateBudget } = useBudgets(monthKey);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [totalLimitInput, setTotalLimitInput] = useState<string>('3000000');
@@ -21,37 +34,38 @@ export const BudgetPage: React.FC = () => {
   const [shoppingLimitInput, setShoppingLimitInput] = useState<string>('300000');
   const [transportLimitInput, setTransportLimitInput] = useState<string>('700000');
 
-  const totalLimit = budget ? budget.totalLimit : 3000000;
-
-  const categorySpent: Record<string, number> = {
-    rent: 0,
-    food: 0,
-    shopping: 0,
-    transport: 0,
+  // Month navigation logic
+  const handlePrevMonth = () => {
+    if (selectedMonth === 1) {
+      setSelectedMonth(12);
+      setSelectedYear((y) => y - 1);
+    } else {
+      setSelectedMonth((m) => m - 1);
+    }
   };
 
-  let totalSpent = 0;
-
-  transactions.forEach((t) => {
-    if (t.type === 'expense') {
-      totalSpent += t.amount;
-      if (categorySpent[t.categoryId] !== undefined) {
-        categorySpent[t.categoryId] += t.amount;
-      }
+  const handleNextMonth = () => {
+    if (selectedMonth === 12) {
+      setSelectedMonth(1);
+      setSelectedYear((y) => y + 1);
+    } else {
+      setSelectedMonth((m) => m + 1);
     }
-  });
+  };
 
-  const remaining = totalLimit - totalSpent;
-  const totalPercentage = totalLimit > 0 ? (totalSpent / totalLimit) * 100 : 0;
+  // Dynamic calculations for selected month/year
+  const totalLimit = budget ? budget.totalLimit : 3000000;
+  const totalSpent = calculateMonthlyExpense(transactions, selectedYear, selectedMonth);
+  const budgetUsage = calculateBudgetUsage(totalSpent, totalLimit);
+
+  const categorySpentMap = calculateMonthlyCategoryExpense(transactions, selectedYear, selectedMonth);
 
   const openEditModal = () => {
     setTotalLimitInput(totalLimit.toString());
-    if (budget) {
-      setRentLimitInput((budget.categoryLimits.rent || 2000000).toString());
-      setFoodLimitInput((budget.categoryLimits.food || 800000).toString());
-      setShoppingLimitInput((budget.categoryLimits.shopping || 300000).toString());
-      setTransportLimitInput((budget.categoryLimits.transport || 700000).toString());
-    }
+    setRentLimitInput((budget?.categoryLimits?.rent ?? 2000000).toString());
+    setFoodLimitInput((budget?.categoryLimits?.food ?? 800000).toString());
+    setShoppingLimitInput((budget?.categoryLimits?.shopping ?? 300000).toString());
+    setTransportLimitInput((budget?.categoryLimits?.transport ?? 700000).toString());
     setIsEditModalOpen(true);
   };
 
@@ -63,8 +77,8 @@ export const BudgetPage: React.FC = () => {
     const parsedTransport = parseInt(transportLimitInput, 10) || 700000;
 
     await updateBudget({
-      id: '2026-11',
-      monthYear: 'Tháng 11/2026',
+      id: monthKey,
+      monthYear: monthDisplayStr,
       totalLimit: parsedTotal,
       categoryLimits: {
         rent: parsedRent,
@@ -78,10 +92,10 @@ export const BudgetPage: React.FC = () => {
   };
 
   const categoryConfigs = [
-    { id: 'rent', name: 'Tiền trọ', limit: budget?.categoryLimits.rent || 2000000 },
-    { id: 'food', name: 'Ăn uống', limit: budget?.categoryLimits.food || 800000 },
-    { id: 'shopping', name: 'Mua sắm', limit: budget?.categoryLimits.shopping || 300000 },
-    { id: 'transport', name: 'Di chuyển', limit: budget?.categoryLimits.transport || 700000 },
+    { id: 'rent', name: 'Tiền trọ', limit: budget?.categoryLimits?.rent ?? 2000000 },
+    { id: 'food', name: 'Ăn uống', limit: budget?.categoryLimits?.food ?? 800000 },
+    { id: 'shopping', name: 'Mua sắm', limit: budget?.categoryLimits?.shopping ?? 300000 },
+    { id: 'transport', name: 'Di chuyển', limit: budget?.categoryLimits?.transport ?? 700000 },
   ];
 
   return (
@@ -90,16 +104,28 @@ export const BudgetPage: React.FC = () => {
         <PageHeader title="Ngân sách" />
 
         <div className="p-4 space-y-4">
+          {/* Month Selector */}
           <div className="flex items-center justify-between bg-white rounded-2xl p-3 border border-[#E8EAF0] text-xs font-semibold shadow-2xs">
-            <button type="button" className="p-1 text-gray-500 hover:text-[#2F5BEA]">
+            <button
+              type="button"
+              onClick={handlePrevMonth}
+              className="p-1 text-[#858A9B] hover:text-[#2F5BEA] transition-colors"
+              aria-label="Tháng trước"
+            >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-[#171923] font-bold">Tháng 11/2026</span>
-            <button type="button" className="p-1 text-gray-500 hover:text-[#2F5BEA]">
+            <span className="text-[#171923] font-bold">{monthDisplayStr}</span>
+            <button
+              type="button"
+              onClick={handleNextMonth}
+              className="p-1 text-[#858A9B] hover:text-[#2F5BEA] transition-colors"
+              aria-label="Tháng sau"
+            >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
+          {/* Main Monthly Budget Card */}
           <div className="bg-white rounded-[20px] p-5 border border-[#E8EAF0] shadow-sm space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs text-[#858A9B] font-semibold">Hạn mức chi tiêu tháng</span>
@@ -117,16 +143,17 @@ export const BudgetPage: React.FC = () => {
               {formatCurrency(totalLimit)}
             </p>
 
+            {/* Progress Bar */}
             <div className="w-full h-3 bg-[#F0F2F5] rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-500 ${
-                  totalPercentage >= 100
+                  budgetUsage.status === 'exceeded'
                     ? 'bg-[#EF4444]'
-                    : totalPercentage >= 80
+                    : budgetUsage.status === 'warning'
                     ? 'bg-[#F59E0B]'
                     : 'bg-[#2F5BEA]'
                 }`}
-                style={{ width: `${Math.min(totalPercentage, 100)}%` }}
+                style={{ width: `${Math.min(budgetUsage.percentage, 100)}%` }}
               />
             </div>
 
@@ -135,52 +162,65 @@ export const BudgetPage: React.FC = () => {
                 Đã chi: <strong className="text-[#171923] font-bold">{formatCurrency(totalSpent)}</strong>
               </span>
               <span className="text-[#858A9B]">
-                Còn lại:{' '}
-                <strong className={remaining < 0 ? 'text-[#EF4444] font-bold' : 'text-[#16A66A] font-bold'}>
-                  {formatCurrency(remaining)}
+                {budgetUsage.isOver ? 'Vượt quá: ' : 'Còn lại: '}
+                <strong className={budgetUsage.isOver ? 'text-[#EF4444] font-bold' : 'text-[#16A66A] font-bold'}>
+                  {formatCurrency(Math.abs(budgetUsage.remaining))}
                 </strong>
               </span>
             </div>
 
-            {totalPercentage >= 80 && (
+            {/* Alert Banner */}
+            {budgetUsage.status === 'warning' && (
               <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-2 text-xs text-amber-800 font-medium">
                 <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>Chú ý: Bạn đã sử dụng hơn 80% ngân sách tháng.</span>
+              </div>
+            )}
+
+            {budgetUsage.status === 'exceeded' && (
+              <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-[#EF4444] font-medium">
+                <AlertTriangle className="w-4 h-4 text-[#EF4444] shrink-0" />
                 <span>
-                  {totalPercentage >= 100
-                    ? 'Cảnh báo: Bạn đã vượt quá hạn mức ngân sách tháng này!'
-                    : 'Chú ý: Bạn đã sử dụng hơn 80% ngân sách tháng.'}
+                  Cảnh báo: Bạn đã vượt quá hạn mức ngân sách tháng này! (Vượt {formatCurrency(budgetUsage.overAmount)})
                 </span>
               </div>
             )}
           </div>
 
+          {/* Category Breakdown */}
           <div className="space-y-3 pt-1">
             <h3 className="text-sm font-bold text-[#171923]">Chi tiết theo danh mục</h3>
 
             <div className="space-y-2.5">
               {categoryConfigs.map((cat) => {
-                const spent = categorySpent[cat.id] || 0;
-                const percentage = cat.limit > 0 ? (spent / cat.limit) * 100 : 0;
+                const spent = categorySpentMap[cat.id] || 0;
+                const catUsage = calculateBudgetUsage(spent, cat.limit);
                 const tagColor =
-                  percentage >= 100
-                    ? 'bg-amber-100 text-amber-800'
-                    : percentage >= 80
-                    ? 'bg-orange-100 text-orange-800'
-                    : 'bg-emerald-100 text-emerald-800';
+                  catUsage.status === 'exceeded'
+                    ? 'bg-amber-100 text-amber-800 font-bold'
+                    : catUsage.status === 'warning'
+                    ? 'bg-orange-100 text-orange-800 font-bold'
+                    : 'bg-emerald-100 text-emerald-800 font-bold';
 
                 return (
                   <div key={cat.id} className="bg-white rounded-[20px] p-4 border border-[#E8EAF0] shadow-2xs space-y-2">
                     <div className="flex items-center justify-between text-xs">
                       <span className="font-bold text-[#171923]">{cat.name}</span>
                       <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${tagColor}`}>
-                        {percentage.toFixed(1)}%
+                        {catUsage.percentage.toFixed(1)}%
                       </span>
                     </div>
 
                     <div className="w-full h-2 bg-[#F0F2F5] rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-[#2F5BEA] rounded-full transition-all"
-                        style={{ width: `${Math.min(percentage, 100)}%` }}
+                        className={`h-full rounded-full transition-all ${
+                          catUsage.status === 'exceeded'
+                            ? 'bg-[#EF4444]'
+                            : catUsage.status === 'warning'
+                            ? 'bg-[#F59E0B]'
+                            : 'bg-[#2F5BEA]'
+                        }`}
+                        style={{ width: `${Math.min(catUsage.percentage, 100)}%` }}
                       />
                     </div>
 
@@ -203,11 +243,12 @@ export const BudgetPage: React.FC = () => {
         if (tab === 'profile') navigate('/profile');
       }} />
 
+      {/* Edit Budget Bottom Sheet Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end justify-center p-0 animate-fade-in">
           <div className="bg-white rounded-t-3xl p-5 w-full max-w-md space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-[#E8EAF0] pb-3">
-              <h3 className="text-base font-bold text-[#171923]">Thiết lập ngân sách</h3>
+              <h3 className="text-base font-bold text-[#171923]">Thiết lập ngân sách {monthDisplayStr}</h3>
               <button
                 type="button"
                 onClick={() => setIsEditModalOpen(false)}
