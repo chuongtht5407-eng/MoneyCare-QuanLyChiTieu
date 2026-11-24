@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell } from 'lucide-react';
+import { Bell, Sparkles, ChevronRight } from 'lucide-react';
 import { BalanceCard } from '../components/BalanceCard';
 import { FinanceSummaryCard } from '../components/FinanceSummaryCard';
 import { BudgetProgress } from '../components/BudgetProgress';
@@ -32,7 +32,6 @@ export const DashboardPage: React.FC = () => {
   const { budget } = useBudgets(monthKey);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Dynamic calculations from user's real transactions
   const totalBalance = calculateTotalBalance(transactions);
   const monthlyIncome = calculateMonthlyIncome(transactions, currentYear, currentMonth);
   const monthlyExpense = calculateMonthlyExpense(transactions, currentYear, currentMonth);
@@ -63,7 +62,7 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col justify-between bg-[#F7F8FC] text-[#171923]">
-      <div className="p-5 space-y-5 flex-1">
+      <div className="p-5 space-y-4 flex-1">
         {/* Header Section */}
         <div className="flex items-center justify-between pt-1">
           <div className="flex items-center gap-3">
@@ -103,13 +102,32 @@ export const DashboardPage: React.FC = () => {
         {/* 1. Dynamic Overall Balance Card */}
         <BalanceCard balance={totalBalance} />
 
-        {/* 2. Dynamic Monthly Income & Expense Cards */}
+        {/* 2. MONEYCARE AI Quick Access Card */}
+        <div
+          onClick={() => navigate('/ai-assistant')}
+          className="bg-gradient-to-r from-[#2F5BEA] to-[#60A5FA] text-white rounded-[20px] p-4 shadow-sm flex items-center justify-between cursor-pointer hover:opacity-95 active:scale-[0.99] transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0">
+              <Sparkles className="w-5 h-5 text-white fill-white" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold leading-tight">Trợ lý MoneyCare AI</h3>
+              <p className="text-[11px] text-blue-100 mt-0.5">
+                Hỏi AI về thu chi, ngân sách & mẹo tiết kiệm
+              </p>
+            </div>
+          </div>
+          <ChevronRight className="w-5 h-5 text-white/80 shrink-0" />
+        </div>
+
+        {/* 3. Dynamic Monthly Income & Expense Cards */}
         <FinanceSummaryCard
           income={monthlyIncome}
           expense={monthlyExpense}
         />
 
-        {/* 3. Monthly Budget Progress Card */}
+        {/* 4. Monthly Budget Progress Card */}
         <div onClick={() => navigate('/budget')} className="cursor-pointer">
           <BudgetProgress
             spent={monthlyExpense}
@@ -118,7 +136,7 @@ export const DashboardPage: React.FC = () => {
           />
         </div>
 
-        {/* 4. Dynamic Recent Transactions */}
+        {/* 5. Dynamic Recent Transactions */}
         <div className="space-y-3 pt-1">
           <div className="flex items-center justify-between">
             <h3 className="text-base font-bold text-[#171923]">Giao dịch gần đây</h3>

@@ -15,6 +15,7 @@ import { TransactionHistoryPage } from '../pages/TransactionHistoryPage';
 import { AnalyticsPage } from '../pages/AnalyticsPage';
 import { BudgetPage } from '../pages/BudgetPage';
 import { ProfilePage } from '../pages/ProfilePage';
+import { AIAssistantPage } from '../pages/AIAssistantPage';
 
 export const router = createBrowserRouter([
   {
@@ -79,6 +80,16 @@ export const router = createBrowserRouter([
       <MobileFrame darkStatusBar={false}>
         <ProtectedRoute>
           <DashboardPage />
+        </ProtectedRoute>
+      </MobileFrame>
+    ),
+  },
+  {
+    path: '/ai-assistant',
+    element: (
+      <MobileFrame darkStatusBar={false}>
+        <ProtectedRoute>
+          <AIAssistantPage />
         </ProtectedRoute>
       </MobileFrame>
     ),
