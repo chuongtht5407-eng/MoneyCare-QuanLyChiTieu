@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { ChatMessage, AIFinanceContext } from '../types/ai';
 import { sendChatMessage } from '../services/aiService';
 import { buildFinanceContext } from '../utils/financeContextBuilder';
@@ -75,12 +75,22 @@ export function useAIChat() {
     [isLoading, messages, includeFinanceContext, transactions, budget]
   );
 
+  const retryLastMessage = useCallback(async () => {
+    const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user');
+    if (lastUserMessage) {
+      // Remove last error message from list
+      setMessages((prev) => prev.filter((m) => !m.isError));
+      await sendMessage(lastUserMessage.content);
+    }
+  }, [messages, sendMessage]);
+
   return {
     messages,
     isLoading,
     includeFinanceContext,
     toggleConsent,
     sendMessage,
+    retryLastMessage,
     clearMessages,
   };
 }
