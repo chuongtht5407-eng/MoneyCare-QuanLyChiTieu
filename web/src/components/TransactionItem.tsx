@@ -133,7 +133,7 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({ transaction })
             isExpense ? 'text-[#EF4444]' : 'text-[#16B364]'
           }`}
         >
-          {formatCurrency(transaction.amount, true)}
+          {formatCurrency(isExpense ? -transaction.amount : transaction.amount, true)}
         </span>
       </div>
     </div>

@@ -18,23 +18,27 @@ if (isFirebaseConfigured && app) {
   }
 }
 
-export const isGeminiConfigured = Boolean(aiInstance || isFirebaseConfigured);
+export const isGeminiConfigured = Boolean(aiInstance);
+
+const MODEL_NAME = 'gemini-3.5-flash-lite';
 
 /**
- * Call single model attempt with system instruction
+ * Call single model attempt with system instruction using gemini-3.5-flash-lite
  */
 async function callGeminiModel(
   ai: ReturnType<typeof getAI>,
-  modelName: string,
   fullPrompt: string,
   history: ChatMessage[]
 ): Promise<string> {
   const model = getGenerativeModel(ai, {
-    model: modelName,
+    model: MODEL_NAME,
     systemInstruction: MONEYCARE_AI_SYSTEM_INSTRUCTION,
   });
 
-  const formattedHistory: Array<{ role: 'user' | 'model'; parts: Array<{ type: 'text'; text: string }> }> = history
+  const formattedHistory: Array<{
+    role: 'user' | 'model';
+    parts: Array<{ type: 'text'; text: string }>;
+  }> = history
     .filter((msg) => !msg.isError)
     .map((msg) => ({
       role: msg.role === 'user' ? ('user' as const) : ('model' as const),
@@ -57,7 +61,8 @@ async function callGeminiModel(
 }
 
 /**
- * Send message with exponential backoff retry and smart model fallback
+ * Send message using Firebase AI Logic with gemini-3.5-flash-lite
+ * Handles retry only on temporary 500 / 503 server busy errors.
  */
 export async function sendChatMessage(
   prompt: string,
@@ -81,32 +86,30 @@ export async function sendChatMessage(
     );
   }
 
-  const candidateModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
   let lastError: Error | null = null;
 
-  for (const modelName of candidateModels) {
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        return await callGeminiModel(aiInstance, modelName, fullPrompt, history);
-      } catch (err: unknown) {
-        const errStr = err instanceof Error ? err.message : String(err);
-        lastError = err instanceof Error ? err : new Error(errStr);
+  // Try up to 2 attempts for temporary 500/503 errors
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      return await callGeminiModel(aiInstance, fullPrompt, history);
+    } catch (err: unknown) {
+      const errStr = err instanceof Error ? err.message : String(err);
+      lastError = err instanceof Error ? err : new Error(errStr);
 
-        const isTemporaryBusy =
-          errStr.includes('500') ||
-          errStr.includes('503') ||
-          errStr.includes('high demand') ||
-          errStr.includes('overloaded') ||
-          errStr.includes('try again later');
+      const isTemporaryBusy =
+        errStr.includes('500') ||
+        errStr.includes('503') ||
+        errStr.includes('high demand') ||
+        errStr.includes('overloaded') ||
+        errStr.includes('try again later');
 
-        if (isTemporaryBusy && attempt < 1) {
-          // Wait 1.2s before retry
-          await new Promise((resolve) => setTimeout(resolve, 1200 * (attempt + 1)));
-          continue;
-        }
-
-        break;
+      if (isTemporaryBusy && attempt < 1) {
+        // Wait 1.2s before retry attempt
+        await new Promise((resolve) => setTimeout(resolve, 1200));
+        continue;
       }
+
+      break;
     }
   }
 
