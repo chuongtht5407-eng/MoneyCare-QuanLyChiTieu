@@ -59,6 +59,27 @@ service cloud.firestore {
           && request.resource.data.totalLimit is number
           && request.resource.data.totalLimit >= 0;
       }
+
+      // =======================================================================
+      // KHỐI 4: LỊCH SỬ CHAT VÀ TIN NHẮN AI (/users/{userId}/aiConversations/{convId})
+      // - Chỉ chủ tài khoản mới được đọc, tạo, sửa, xóa cuộc trò chuyện của mình.
+      // - userId: bắt buộc trùng với request.auth.uid.
+      // =======================================================================
+      match /aiConversations/{convId} {
+        allow read, delete: if request.auth != null && request.auth.uid == userId;
+
+        allow create, update: if request.auth != null
+          && request.auth.uid == userId
+          && request.resource.data.userId == request.auth.uid;
+
+        match /messages/{msgId} {
+          allow read, delete: if request.auth != null && request.auth.uid == userId;
+
+          allow create, update: if request.auth != null
+            && request.auth.uid == userId
+            && request.resource.data.role in ['user', 'model', 'system'];
+        }
+      }
     }
   }
 }

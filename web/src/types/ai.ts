@@ -2,10 +2,21 @@ export type ChatRole = 'user' | 'model' | 'system';
 
 export interface ChatMessage {
   id: string;
+  conversationId?: string;
   role: ChatRole;
   content: string;
   timestamp: string;
+  createdAt?: string;
   isError?: boolean;
+}
+
+export interface AIConversation {
+  id: string;
+  userId: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  lastMessagePreview?: string;
 }
 
 export interface AIFinanceContext {

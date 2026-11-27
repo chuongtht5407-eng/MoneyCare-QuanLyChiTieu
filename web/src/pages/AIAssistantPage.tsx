@@ -1,25 +1,34 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { AIChatHeader } from '../components/ai/AIChatHeader';
 import { AIChatMessage } from '../components/ai/AIChatMessage';
 import { AIChatSuggestions } from '../components/ai/AIChatSuggestions';
 import { AIChatLoading } from '../components/ai/AIChatLoading';
 import { AIChatInput } from '../components/ai/AIChatInput';
 import { AIFinanceConsent } from '../components/ai/AIFinanceConsent';
+import { AIChatDrawer } from '../components/ai/AIChatDrawer';
 import { useAIChat } from '../hooks/useAIChat';
 import { RotateCw } from 'lucide-react';
 
 export const AIAssistantPage: React.FC = () => {
   const {
+    conversations,
+    activeConversationId,
     messages,
     isLoading,
     includeFinanceContext,
     toggleConsent,
     sendMessage,
     retryLastMessage,
-    clearMessages,
+    createNewConversation,
+    selectConversation,
+    removeConversation,
+    renameConv,
   } = useAIChat();
 
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  const activeConv = conversations.find((c) => c.id === activeConversationId);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -32,9 +41,13 @@ export const AIAssistantPage: React.FC = () => {
   const hasError = messages.some((m) => m.isError);
 
   return (
-    <div className="flex-1 flex flex-col justify-between bg-[#F7F8FC] text-[#171923] h-screen max-h-screen overflow-hidden">
+    <div className="relative flex-1 flex flex-col justify-between bg-[#F7F8FC] text-[#171923] h-screen max-h-screen overflow-hidden">
       {/* 1. Sticky Header */}
-      <AIChatHeader onClear={clearMessages} />
+      <AIChatHeader
+        onToggleDrawer={() => setIsDrawerOpen(true)}
+        onNewChat={createNewConversation}
+        activeTitle={activeConv?.title}
+      />
 
       {/* 2. Scrollable Chat Content Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar">
@@ -75,7 +88,7 @@ export const AIAssistantPage: React.FC = () => {
             <button
               onClick={retryLastMessage}
               type="button"
-              className="px-4 py-2 rounded-full bg-[#2F5BEA] text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm hover:bg-[#244CD9] transition-all active:scale-95"
+              className="px-4 py-2 rounded-full bg-[#2F5BEA] text-[#ffffff] text-xs font-semibold flex items-center gap-1.5 shadow-sm hover:bg-[#244CD9] transition-all active:scale-95"
             >
               <RotateCw className="w-3.5 h-3.5" />
               <span>Thử lại</span>
@@ -96,6 +109,18 @@ export const AIAssistantPage: React.FC = () => {
           Thông tin từ AI chỉ mang tính chất tham khảo.
         </p>
       </div>
+
+      {/* 4. Chat History Drawer Panel Bounded Inside Frame Container */}
+      <AIChatDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        conversations={conversations}
+        activeConversationId={activeConversationId}
+        onSelectConversation={selectConversation}
+        onNewConversation={createNewConversation}
+        onDeleteConversation={removeConversation}
+        onRenameConversation={renameConv}
+      />
     </div>
   );
 };

@@ -7,21 +7,23 @@ import {
   AppCheck,
 } from 'firebase/app-check';
 
+const env = (import.meta && import.meta.env) ? import.meta.env : ({} as Record<string, string>);
+
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '',
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
+  apiKey: env.VITE_FIREBASE_API_KEY || '',
+  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN || '',
+  projectId: env.VITE_FIREBASE_PROJECT_ID || '',
+  storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET || '',
+  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
+  appId: env.VITE_FIREBASE_APP_ID || '',
 };
 
 const appCheckSiteKey =
-  import.meta.env.VITE_FIREBASE_APPCHECK_SITE_KEY ||
-  import.meta.env.VITE_RECAPTCHA_SITE_KEY ||
+  env.VITE_FIREBASE_APPCHECK_SITE_KEY ||
+  env.VITE_RECAPTCHA_SITE_KEY ||
   '';
 
-const customDebugToken = import.meta.env.VITE_FIREBASE_APPCHECK_DEBUG_TOKEN || '';
+const customDebugToken = env.VITE_FIREBASE_APPCHECK_DEBUG_TOKEN || '';
 
 export const isFirebaseConfigured = Boolean(
   firebaseConfig.apiKey &&
@@ -41,7 +43,7 @@ if (isFirebaseConfigured) {
     db = getFirestore(app);
 
     // Enable App Check Debug Mode ONLY on Local Development before initializeAppCheck
-    if (import.meta.env.DEV) {
+    if (env.DEV) {
       if (customDebugToken) {
         (self as unknown as { FIREBASE_APPCHECK_DEBUG_TOKEN: string }).FIREBASE_APPCHECK_DEBUG_TOKEN = customDebugToken;
       } else {
