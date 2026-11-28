@@ -58,6 +58,41 @@
   animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+@keyframes academyTabEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.academy-tab-enter {
+  animation: academyTabEnter 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.academy-fade-in {
+  animation: academyTabEnter 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-up,
+  .academy-tab-enter,
+  .academy-fade-in {
+    animation: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Custom scrollbar hiding */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

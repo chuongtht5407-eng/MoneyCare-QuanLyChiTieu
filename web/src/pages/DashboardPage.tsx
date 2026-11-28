@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Sparkles, ChevronRight } from 'lucide-react';
+import { Bell, Sparkles, GraduationCap, ChevronRight, Flame } from 'lucide-react';
 import { BalanceCard } from '../components/BalanceCard';
 import { FinanceSummaryCard } from '../components/FinanceSummaryCard';
 import { BudgetProgress } from '../components/BudgetProgress';
@@ -18,6 +18,11 @@ import {
   calculateMonthlyExpense,
   calculateBudgetUsage,
 } from '../utils/finance';
+import {
+  fetchAcademyProgress,
+  calculateLevelInfo,
+  AcademyProgress,
+} from '../services/academyService';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -31,6 +36,24 @@ export const DashboardPage: React.FC = () => {
 
   const { budget } = useBudgets(monthKey);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const [academyProg, setAcademyProg] = useState<AcademyProgress>({
+    totalXP: 0,
+    currentStreak: 0,
+    longestStreak: 0,
+    lastCompletedDate: null,
+    updatedAt: new Date().toISOString(),
+  });
+
+  useEffect(() => {
+    async function loadProg() {
+      const prog = await fetchAcademyProgress();
+      setAcademyProg(prog);
+    }
+    loadProg();
+  }, [user?.uid]);
+
+  const levelInfo = calculateLevelInfo(academyProg.totalXP);
 
   const totalBalance = calculateTotalBalance(transactions);
   const monthlyIncome = calculateMonthlyIncome(transactions, currentYear, currentMonth);
@@ -121,13 +144,46 @@ export const DashboardPage: React.FC = () => {
           <ChevronRight className="w-5 h-5 text-white/80 shrink-0" />
         </div>
 
-        {/* 3. Dynamic Monthly Income & Expense Cards */}
+        {/* 3. MONEYCARE ACADEMY Card */}
+        <div
+          onClick={() => navigate('/academy')}
+          className="bg-gradient-to-r from-[#2F5BEA] via-[#3B82F6] to-[#8B5CF6] text-white rounded-[20px] p-4 shadow-sm flex items-center justify-between cursor-pointer hover:opacity-95 active:scale-[0.99] transition-all"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0">
+              <GraduationCap className="w-5 h-5 text-white" />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold leading-tight truncate">MoneyCare Academy</h3>
+                <span className="text-[9px] bg-white/25 px-1.5 py-0.5 rounded-full font-extrabold uppercase tracking-wider shrink-0">
+                  Cấp {levelInfo.level}
+                </span>
+              </div>
+              <p className="text-[11px] text-blue-100 mt-0.5 truncate flex items-center gap-1">
+                <span>{academyProg.totalXP} XP</span>
+                <span>•</span>
+                <span className="flex items-center gap-0.5 text-yellow-300 font-extrabold">
+                  <Flame className="w-3 h-3 fill-yellow-300" />
+                  {academyProg.currentStreak} ngày
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1 bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ml-2">
+            <span>Bắt đầu học</span>
+            <ChevronRight className="w-4 h-4" />
+          </div>
+        </div>
+
+        {/* 4. Dynamic Monthly Income & Expense Cards */}
         <FinanceSummaryCard
           income={monthlyIncome}
           expense={monthlyExpense}
         />
 
-        {/* 4. Monthly Budget Progress Card */}
+        {/* 5. Monthly Budget Progress Card */}
         <div onClick={() => navigate('/budget')} className="cursor-pointer">
           <BudgetProgress
             spent={monthlyExpense}
@@ -136,7 +192,7 @@ export const DashboardPage: React.FC = () => {
           />
         </div>
 
-        {/* 5. Dynamic Recent Transactions */}
+        {/* 6. Dynamic Recent Transactions */}
         <div className="space-y-3 pt-1">
           <div className="flex items-center justify-between">
             <h3 className="text-base font-bold text-[#171923]">Giao dịch gần đây</h3>

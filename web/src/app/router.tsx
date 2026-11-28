@@ -16,6 +16,7 @@ import { AnalyticsPage } from '../pages/AnalyticsPage';
 import { BudgetPage } from '../pages/BudgetPage';
 import { ProfilePage } from '../pages/ProfilePage';
 import { AIAssistantPage } from '../pages/AIAssistantPage';
+import { AcademyPage } from '../pages/AcademyPage';
 
 export const router = createBrowserRouter([
   {
@@ -90,6 +91,16 @@ export const router = createBrowserRouter([
       <MobileFrame darkStatusBar={false}>
         <ProtectedRoute>
           <AIAssistantPage />
+        </ProtectedRoute>
+      </MobileFrame>
+    ),
+  },
+  {
+    path: '/academy',
+    element: (
+      <MobileFrame darkStatusBar={false}>
+        <ProtectedRoute>
+          <AcademyPage />
         </ProtectedRoute>
       </MobileFrame>
     ),
